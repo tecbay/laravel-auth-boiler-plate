@@ -1,12 +1,12 @@
 # Laravel Auth Boiler plate
 
 ## Installation
-First clone the ripo;
+**First clone the ripo**
 
 1. Install the package via composer:
-    ```shell
-    composer install
-    ```
+```shell
+composer install
+```
 
 2. Run the migration
 ```shell
