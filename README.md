@@ -23,4 +23,4 @@ First clone the ripo;
 4. Now create a user with role admin
     ```shell
           php artisan create:admin
-        ```
+     ```
