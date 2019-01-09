@@ -9,18 +9,16 @@ First clone the ripo;
     ```
 
 2. Run the migration
-    ```shell
-    php artisan migrate
-    ```
+```shell
+php artisan migrate
+```
 
 3. Create a admin and user role 
-    ```shell
-    php artisan permission:create-role user
-    ```
-   ```shell
-      php artisan permission:create-role admin
-    ```
+```shell
+php artisan permission:create-role user
+php artisan permission:create-role admin
+```
 4. Now create a user with role admin
-    ```shell
-          php artisan create:admin
-     ```
+```shell
+  php artisan create:admin
+```
