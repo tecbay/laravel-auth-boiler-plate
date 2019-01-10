@@ -82,4 +82,19 @@ class RegisterController extends Controller {
 		return $this->registered( $request, $user )
 			?: redirect( $this->redirectPath() );
 	}
+
+	/**
+	 * @return return the rediraction url after Register
+	 */
+	public function redirectTo() {
+
+
+		if ( auth()->user()->hasRole( 'admin' ) ) {
+			$redirect = route( 'admin.home' );
+		} else {
+			$redirect = route( 'user.home' );
+		}
+
+		return $redirect;
+	}
 }

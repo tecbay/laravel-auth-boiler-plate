@@ -1,67 +1,78 @@
 <?php
 
 //<editor-fold desc="Login Routes">
+Route::get( 'password/reset/{token}', 'Auth\ResetPasswordController@showResetForm' );
 Route::group( [
 	'prefix'     => LaravelLocalization::setLocale(),
-	'middleware' => [ 'localeSessionRedirect', 'localizationRedirect', 'localeViewPath' ]
+	'middleware' => [ 'localeSessionRedirect', 'localizationRedirect', 'localeViewPath', 'localize' ]
 ], function () {
-	Auth::routes();
+	// Authentication Routes...
+	Route::get( 'login', 'Auth\LoginController@showLoginForm' );
+	// Registration Routes...
+	Route::get( 'register', 'Auth\RegisterController@showRegistrationForm' )->name( 'register' );
+	// Password Reset Routes...
+	Route::get( 'password/reset', 'Auth\ForgotPasswordController@showLinkRequestForm' );
+} );
+Route::post( 'login', 'Auth\LoginController@login' )->name( 'login' );
+Route::post( 'register', 'Auth\RegisterController@register' )->name( 'register' );
+Route::post( 'password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail' );
+Route::post( 'password/reset', 'Auth\ResetPasswordController@reset' );
+Route::post( 'logout', 'Auth\LoginController@logout' )->name( 'logout' );
+//</editor-fold>
+// +++++++++++++++++++++Guest route group+++++++++++++++++++++++++++++++++++++++++++++++++++
+//<editor-fold desc="Guest Routes group">
+Route::group( [
+	'namespace'  => 'Guest',
+	'middleware' => [ 'guest' ],
+	'prefix'     => LaravelLocalization::setLocale()
+], function () {
+	// All Guest routes
+	Route::get( '/', 'HomeController' );
 } );
 //</editor-fold>
 
-//<editor-fold desc="Guest Routes">
-Route::group( [ 'middleware' => [ 'guest' ], 'prefix' => LaravelLocalization::setLocale() ], function () {
-	Route::get( '/', function () {
-		return view( 'welcome' );
-	} );
-} );
-//</editor-fold>
-
-// All Authenticate user routes
+// +++++++++++++++++++++Auth route group++++++++++++++++++++++++++++++++++++++++++++++++++++
 Route::group( [ 'middleware' => [ 'auth' ] ], function () {
-	//<editor-fold desc="Redirecting user after login base on role">
-	Route::get( '/home', function () {
-		if ( auth()->user()->hasRole( 'admin' ) ) {
-			$redirect = redirect( route( 'admin.home' ) );
-		} else {
-			$redirect = redirect( route( 'user.home' ) );
-		}
-
-		return $redirect;
-	} )->name( 'home' );
-	//</editor-fold>
-
+	//+++++++++++++++Admin Route Groupe++++++++++++++++++++++++++
 	//<editor-fold desc="Admin Route">
-	Route::group( [ 'middleware' => [ 'role:admin' ], 'as' => 'admin.' ], function () {
+	Route::group( [
+		'namespace'  => 'admin',
+		'middleware' => [ 'role:admin' ],
+		'as'         => 'admin.'
+	], function () {
 		// All Admin Routes +++++
-		Route::get( '/admin', function () {
-			return view( 'home' );
-		} )->name( 'home' );
+		Route::get( '/admin', 'HomeController' )->name( 'home' );
 
 	} );
 	//</editor-fold>
-
+	//+++++++++++++++++++++User Route Groupe+++++++++++++++++++++++
 	//<editor-fold desc="User Route">
 	Route::group( [
+		'namespace'  => 'User',
 		'prefix'     => LaravelLocalization::setLocale(),
-		'middleware' => [ 'role:user', 'localeSessionRedirect', 'localizationRedirect', 'localeViewPath' ,'localize']
-	],
-		function () {
-			//All User Routes +++++
-			Route::get( '/user', function () {
-				return view( 'home' );
-			} )->name( 'user.home' );
-
-
-			Route::get( LaravelLocalization::transRoute('routes.posts'), function () {
+		'middleware' => [ 'role:user' ]
+	], function () {
+		//++++ Localized Route Group
+		Route::group( [
+			'localeSessionRedirect',
+			'localizationRedirect',
+			'localeViewPath',
+			'localize'
+		], function () {
+			Route::get( '/user', 'HomeController' )->name( 'user.home' );
+			Route::get( LaravelLocalization::transRoute( 'routes.posts' ), function () {
 				return view( 'home' );
 			} )->name( 'post.all' );
 
-			Route::get( '/post/1', function () {
+			Route::get( '/post/1', function ( $as ) {
 				return view( 'home' );
 			} )->name( 'post' );
-
 		} );
+		//++++ Localized Route Group xxxxxx End
+
+
+
+	} );
 	//</editor-fold>
 } );
-// All Authenticate user routes end
+
