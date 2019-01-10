@@ -13,8 +13,17 @@
                             {{ session('status') }}
                         </div>
                     @endif
-
+                    <a href="{{route('post.all')}}"> All post</a>
                     You are logged in!
+                        <ul>
+                            @foreach(LaravelLocalization::getSupportedLocales() as $localeCode => $properties)
+                                <li>
+                                    <a rel="alternate" hreflang="{{ $localeCode }}" href="{{ LaravelLocalization::getLocalizedURL($localeCode, null, [], true) }}">
+                                        {{ $properties['native'] }}
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
                 </div>
             </div>
         </div>

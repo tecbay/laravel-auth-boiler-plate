@@ -1,21 +1,16 @@
 <?php
 
-/*
-
- Route::group(['middleware' => ['role:super-admin|writer']], function () {
-
-});
-
-Route::group(['middleware' => ['permission:publish articles|edit articles']], function () {
-
-});
-
-*/
-Auth::routes();
-
+//<editor-fold desc="Login Routes">
+Route::group( [
+	'prefix'     => LaravelLocalization::setLocale(),
+	'middleware' => [ 'localeSessionRedirect', 'localizationRedirect', 'localeViewPath' ]
+], function () {
+	Auth::routes();
+} );
+//</editor-fold>
 
 //<editor-fold desc="Guest Routes">
-Route::group( [ 'middleware' => [ 'guest' ] ], function () {
+Route::group( [ 'middleware' => [ 'guest' ], 'prefix' => LaravelLocalization::setLocale() ], function () {
 	Route::get( '/', function () {
 		return view( 'welcome' );
 	} );
@@ -47,13 +42,26 @@ Route::group( [ 'middleware' => [ 'auth' ] ], function () {
 	//</editor-fold>
 
 	//<editor-fold desc="User Route">
-	Route::group( [ 'middleware' => [ 'role:user' ] ], function () {
-		//All User Routes +++++
-		Route::get( '/user', function () {
-			return view( 'home' );
-		} )->name( 'user.home' );
+	Route::group( [
+		'prefix'     => LaravelLocalization::setLocale(),
+		'middleware' => [ 'role:user', 'localeSessionRedirect', 'localizationRedirect', 'localeViewPath' ,'localize']
+	],
+		function () {
+			//All User Routes +++++
+			Route::get( '/user', function () {
+				return view( 'home' );
+			} )->name( 'user.home' );
 
-	} );
+
+			Route::get( LaravelLocalization::transRoute('routes.posts'), function () {
+				return view( 'home' );
+			} )->name( 'post.all' );
+
+			Route::get( '/post/1', function () {
+				return view( 'home' );
+			} )->name( 'post' );
+
+		} );
 	//</editor-fold>
 } );
 // All Authenticate user routes end
